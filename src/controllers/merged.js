@@ -11,18 +11,14 @@ cloudinary.config({
   });
 
 
-exports.mergedImagess = async (artworkUrl) => {
+  exports.mergedImagess = async (artworkUrl) => {
     try {
-console.log(process.env.CLOUDINARY_API_KEY)
-
+      console.log(process.env.CLOUDINARY_API_KEY);
+  
       const artwork = await fetchImageBuffer(artworkUrl);
       if (!artwork || artwork.length === 0) {
         throw new Error('Artwork buffer is empty');
       }
-  
-      const resizedArtwork = await sharp(artwork)
-        .resize(2000, 2000, { fit: 'cover' })
-        .toBuffer();
   
       const products = ['cup', 'pillow', 'book', 'iphon', 'bag', 'shirt'];
       const mergedImages = {};
@@ -36,11 +32,27 @@ console.log(process.env.CLOUDINARY_API_KEY)
           throw new Error(`Product texture buffer for ${product} is empty`);
         }
   
+        const { width: productWidth, height: productHeight } = await sharp(productTexture).metadata();
+  
+        const resizedArtwork = await sharp(artwork)
+          .resize(productWidth, productHeight, { fit: 'contain' })
+          .toBuffer();
+  
+        const { width: artworkWidth, height: artworkHeight } = await sharp(resizedArtwork).metadata();
+  
+        const left = Math.floor((productWidth - artworkWidth) / 2);
+        const top = Math.floor((productHeight - artworkHeight) / 2);
+  
         const mergedImage = await sharp(productTexture)
-          .resize(2000, 2000, { fit: 'cover' })
           .composite([
-            { input: resizedArtwork, blend: 'screen' },
+            { 
+              input: resizedArtwork, 
+              blend: 'screen',
+              left: left,
+              top: top
+            },
           ])
+          .sharpen()
           .toBuffer();
   
         // Upload merged image to Cloudinary
@@ -54,8 +66,7 @@ console.log(process.env.CLOUDINARY_API_KEY)
       console.log(error);
       throw error;
     }
-  }
-  
+  };
   async function fetchImageBuffer(url) {
     console.log(`Fetching image from URL: ${url}`);
     const response = await fetch(url);
