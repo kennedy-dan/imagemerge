@@ -39,7 +39,7 @@ console.log(process.env.CLOUDINARY_API_KEY)
         const mergedImage = await sharp(productTexture)
           .resize(2000, 2000, { fit: 'cover' })
           .composite([
-            { input: resizedArtwork, blend: 'overlay' },
+            { input: resizedArtwork, blend: 'screen' },
           ])
           .toBuffer();
   
