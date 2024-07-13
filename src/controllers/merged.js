@@ -47,7 +47,7 @@ cloudinary.config({
           .composite([
             { 
               input: resizedArtwork, 
-              blend: 'screen',
+              blend: 'overlay',
               left: left,
               top: top
             },
