@@ -35,7 +35,7 @@ cloudinary.config({
         const { width: productWidth, height: productHeight } = await sharp(productTexture).metadata();
   
         const resizedArtwork = await sharp(artwork)
-          .resize(productWidth, productHeight, { fit: 'contain' })
+          .resize(productWidth, productHeight, { fit: 'cover' })
           .toBuffer();
   
         const { width: artworkWidth, height: artworkHeight } = await sharp(resizedArtwork).metadata();
