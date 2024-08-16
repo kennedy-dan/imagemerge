@@ -47,7 +47,7 @@ cloudinary.config({
           .composite([
             { 
               input: resizedArtwork, 
-              blend: 'overlay',
+              blend: 'color-burn',
               left: left,
               top: top
             },
