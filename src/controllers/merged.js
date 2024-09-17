@@ -20,7 +20,7 @@ cloudinary.config({
         throw new Error('Artwork buffer is empty');
       }
   
-      const products = ['cup', 'pillow', 'book', 'iphon', 'bag', 'shirt'];
+      const products = ['cup', 'pillow', 'book', 'iphone', 'bag', 'shirt'];
       const mergedImages = {};
   
       for (const product of products) {
@@ -42,17 +42,21 @@ cloudinary.config({
   
         const left = Math.floor((productWidth - artworkWidth) / 2);
         const top = Math.floor((productHeight - artworkHeight) / 2);
+
+           const shiftRight = 13; 
+    const shiftDown = 0;
   
         const mergedImage = await sharp(productTexture)
           .composite([
             { 
               input: resizedArtwork, 
-              blend: 'color-burn',
-              left: left,
-              top: top
+              blend: 'overlay',
+              left: shiftRight,
+              top: shiftDown
             },
           ])
           .sharpen()
+      .modulate({ brightness: 1.2 }) // Increase brightness
           .toBuffer();
   
         // Upload merged image to Cloudinary
