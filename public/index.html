@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Image Merge Tester</title>
+     <style>
+          * {
+               margin: 0;
+               padding: 0;
+               box-sizing: border-box;
+          }
+
+          body {
+               font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+               background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+               min-height: 100vh;
+               padding: 20px;
+          }
+
+          .container {
+               max-width: 1200px;
+               margin: 0 auto;
+               background: white;
+               border-radius: 20px;
+               box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+               overflow: hidden;
+          }
+
+          .header {
+               background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+               color: white;
+               padding: 30px;
+               text-align: center;
+          }
+
+          .header h1 {
+               font-size: 2.5rem;
+               margin-bottom: 10px;
+          }
+
+          .header p {
+               font-size: 1.1rem;
+               opacity: 0.9;
+          }
+
+          .tab-container {
+               display: flex;
+               background: #f8f9ff;
+               border-bottom: 1px solid #e0e0e0;
+          }
+
+          .tab {
+               flex: 1;
+               padding: 20px;
+               text-align: center;
+               cursor: pointer;
+               background: #f8f9ff;
+               border: none;
+               font-size: 1.1rem;
+               font-weight: 600;
+               color: #666;
+               transition: all 0.3s ease;
+          }
+
+          .tab.active {
+               background: white;
+               color: #667eea;
+               border-bottom: 3px solid #667eea;
+          }
+
+          .tab:hover {
+               background: #f0f4ff;
+          }
+
+          .tab-content {
+               display: none;
+          }
+
+          .tab-content.active {
+               display: block;
+          }
+
+          .upload-section {
+               padding: 40px;
+               text-align: center;
+          }
+
+          .upload-area {
+               border: 3px dashed #667eea;
+               border-radius: 15px;
+               padding: 40px;
+               margin-bottom: 30px;
+               transition: all 0.3s ease;
+               cursor: pointer;
+          }
+
+          .upload-area:hover {
+               border-color: #764ba2;
+               background: #f8f9ff;
+          }
+
+          .upload-area.dragover {
+               border-color: #764ba2;
+               background: #f0f4ff;
+               transform: scale(1.02);
+          }
+
+          .upload-icon {
+               font-size: 3rem;
+               color: #667eea;
+               margin-bottom: 20px;
+          }
+
+          .upload-text {
+               font-size: 1.2rem;
+               color: #666;
+               margin-bottom: 15px;
+          }
+
+          .file-input {
+               display: none;
+          }
+
+          .upload-btn {
+               background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+               color: white;
+               border: none;
+               padding: 12px 30px;
+               border-radius: 25px;
+               font-size: 1rem;
+               cursor: pointer;
+               transition: transform 0.2s ease;
+          }
+
+          .upload-btn:hover {
+               transform: translateY(-2px);
+          }
+
+          .merge-btn {
+               background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+               color: white;
+               border: none;
+               padding: 15px 40px;
+               border-radius: 25px;
+               font-size: 1.1rem;
+               cursor: pointer;
+               transition: all 0.3s ease;
+               margin-top: 20px;
+          }
+
+          .merge-btn:hover {
+               transform: translateY(-2px);
+               box-shadow: 0 10px 20px rgba(17, 153, 142, 0.3);
+          }
+
+          .merge-btn:disabled {
+               background: #ccc;
+               cursor: not-allowed;
+               transform: none;
+          }
+
+          .load-cloudinary-btn {
+               background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+               color: white;
+               border: none;
+               padding: 15px 40px;
+               border-radius: 25px;
+               font-size: 1.1rem;
+               cursor: pointer;
+               transition: all 0.3s ease;
+               margin: 20px;
+          }
+
+          .load-cloudinary-btn:hover {
+               transform: translateY(-2px);
+               box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+          }
+
+          .preview-section {
+               padding: 20px 40px;
+          }
+
+          .preview-image {
+               max-width: 200px;
+               max-height: 200px;
+               border-radius: 10px;
+               box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+               margin: 20px auto;
+               display: block;
+          }
+
+          .url-input-area {
+               text-align: center;
+               margin-bottom: 30px;
+          }
+
+          .url-input-area h3 {
+               color: #333;
+               margin-bottom: 10px;
+               font-size: 1.5rem;
+          }
+
+          .url-input-area p {
+               color: #666;
+               margin-bottom: 20px;
+          }
+
+          .url-input-container {
+               display: flex;
+               gap: 10px;
+               max-width: 500px;
+               margin: 0 auto;
+               align-items: center;
+          }
+
+          .url-input {
+               flex: 1;
+               padding: 12px 15px;
+               border: 2px solid #ddd;
+               border-radius: 25px;
+               font-size: 1rem;
+               outline: none;
+               transition: border-color 0.3s ease;
+          }
+
+          .url-input:focus {
+               border-color: #667eea;
+          }
+
+          .url-preview-btn {
+               background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+               color: white;
+               border: none;
+               padding: 12px 20px;
+               border-radius: 25px;
+               font-size: 1rem;
+               cursor: pointer;
+               transition: transform 0.2s ease;
+               white-space: nowrap;
+          }
+
+          .url-preview-btn:hover {
+               transform: translateY(-2px);
+          }
+
+          .results-section {
+               padding: 40px;
+               background: #f8f9ff;
+          }
+
+          .results-title {
+               text-align: center;
+               font-size: 2rem;
+               color: #333;
+               margin-bottom: 30px;
+          }
+
+          .gallery {
+               display: grid;
+               grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+               gap: 30px;
+               margin-top: 30px;
+          }
+
+          .product-card {
+               background: white;
+               border-radius: 15px;
+               padding: 20px;
+               box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+               transition: transform 0.3s ease;
+               text-align: center;
+          }
+
+          .product-card:hover {
+               transform: translateY(-5px);
+          }
+
+          .product-title {
+               font-size: 1.3rem;
+               color: #333;
+               margin-bottom: 15px;
+               text-transform: capitalize;
+               font-weight: 600;
+          }
+
+          .product-image {
+               width: 100%;
+               max-width: 250px;
+               height: auto;
+               border-radius: 10px;
+               box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+               transition: transform 0.3s ease;
+          }
+
+          .product-image:hover {
+               transform: scale(1.05);
+          }
+
+          .loading {
+               display: none;
+               text-align: center;
+               padding: 40px;
+          }
+
+          .spinner {
+               border: 4px solid #f3f3f3;
+               border-top: 4px solid #667eea;
+               border-radius: 50%;
+               width: 50px;
+               height: 50px;
+               animation: spin 1s linear infinite;
+               margin: 0 auto 20px;
+          }
+
+          @keyframes spin {
+               0% {
+                    transform: rotate(0deg);
+               }
+
+               100% {
+                    transform: rotate(360deg);
+               }
+          }
+
+          .error {
+               background: #ff6b6b;
+               color: white;
+               padding: 15px;
+               border-radius: 10px;
+               margin: 20px 0;
+               display: none;
+          }
+
+          .success {
+               background: #51cf66;
+               color: white;
+               padding: 15px;
+               border-radius: 10px;
+               margin: 20px 0;
+               display: none;
+          }
+
+          .cloudinary-section {
+               padding: 40px;
+               text-align: center;
+          }
+
+          .cloudinary-info {
+               background: #e3f2fd;
+               padding: 20px;
+               border-radius: 10px;
+               margin-bottom: 30px;
+               border-left: 4px solid #2196f3;
+          }
+
+          @media (max-width: 768px) {
+               .header h1 {
+                    font-size: 2rem;
+               }
+
+               .upload-section {
+                    padding: 20px;
+               }
+
+               .gallery {
+                    grid-template-columns: 1fr;
+               }
+
+               .tab-container {
+                    flex-direction: column;
+               }
+          }
+     </style>
+</head>
+
+<body>
+     <div class="container">
+          <div class="header">
+               <h1>🎨 Image Merge Studio</h1>
+               <p>Upload your artwork or view existing Cloudinary images!</p>
+          </div>
+
+          <div class="tab-container">
+               <button class="tab active" onclick="switchTab('upload')">📤 Upload & Merge</button>
+               <button class="tab" onclick="switchTab('url')">🔗 URL Merge</button>
+               <button class="tab" onclick="switchTab('cloudinary')">☁️ Cloudinary Gallery</button>
+          </div>
+
+          <!-- Upload Tab Content -->
+          <div id="upload-tab" class="tab-content active">
+               <div class="upload-section">
+                    <div class="upload-area" id="uploadArea">
+                         <div class="upload-icon">📁</div>
+                         <div class="upload-text">Drag & drop your image here or click to browse</div>
+                         <button class="upload-btn" onclick="document.getElementById('fileInput').click()">Choose
+                              File</button>
+                         <input type="file" id="fileInput" class="file-input" accept="image/*">
+                    </div>
+
+                    <div class="preview-section" id="previewSection" style="display: none;">
+                         <h3>Preview:</h3>
+                         <img id="previewImage" class="preview-image" alt="Preview">
+                         <button class="merge-btn" id="mergeBtn">🚀 Merge with Products</button>
+                    </div>
+
+                    <div class="error" id="errorMsg"></div>
+                    <div class="success" id="successMsg"></div>
+               </div>
+          </div>
+
+          <!-- URL Tab Content -->
+          <div id="url-tab" class="tab-content">
+               <div class="upload-section">
+                    <div class="url-input-area">
+                         <h3>🔗 Enter Image URL</h3>
+                         <p>Paste the URL of an image you want to merge with products</p>
+                         <div class="url-input-container">
+                              <input type="url" id="imageUrlInput" placeholder="https://example.com/image.jpg" class="url-input">
+                              <button class="url-preview-btn" id="urlPreviewBtn">Preview</button>
+                         </div>
+                    </div>
+
+                    <div class="preview-section" id="urlPreviewSection" style="display: none;">
+                         <h3>Preview:</h3>
+                         <img id="urlPreviewImage" class="preview-image" alt="URL Preview">
+                         <button class="merge-btn" id="urlMergeBtn">🚀 Merge with Products</button>
+                    </div>
+
+                    <div class="error" id="urlErrorMsg"></div>
+                    <div class="success" id="urlSuccessMsg"></div>
+               </div>
+          </div>
+
+          <!-- Cloudinary Tab Content -->
+          <div id="cloudinary-tab" class="tab-content">
+               <div class="cloudinary-section">
+                    <div class="cloudinary-info">
+                         <h3>📸 Cloudinary Image Gallery</h3>
+                         <p>View and display images that are already stored in your Cloudinary account. This includes
+                              product templates and previously merged images.</p>
+                    </div>
+
+                    <button class="load-cloudinary-btn" id="loadCloudinaryBtn">🔄 Load Cloudinary Images</button>
+
+                    <div class="error" id="cloudinaryErrorMsg"></div>
+                    <div class="success" id="cloudinarySuccessMsg"></div>
+               </div>
+          </div>
+
+          <div class="loading" id="loading">
+               <div class="spinner"></div>
+               <p id="loadingText">Merging your artwork with products... This may take a moment.</p>
+          </div>
+
+          <div class="results-section" id="resultsSection" style="display: none;">
+               <h2 class="results-title" id="resultsTitle">🎉 Your Merged Products</h2>
+               <div class="gallery" id="gallery"></div>
+          </div>
+     </div>
+
+     <script>
+          const uploadArea = document.getElementById('uploadArea');
+          const fileInput = document.getElementById('fileInput');
+          const previewSection = document.getElementById('previewSection');
+          const previewImage = document.getElementById('previewImage');
+          const mergeBtn = document.getElementById('mergeBtn');
+          const loadCloudinaryBtn = document.getElementById('loadCloudinaryBtn');
+          const loading = document.getElementById('loading');
+          const loadingText = document.getElementById('loadingText');
+          const resultsSection = document.getElementById('resultsSection');
+          const resultsTitle = document.getElementById('resultsTitle');
+          const gallery = document.getElementById('gallery');
+          const errorMsg = document.getElementById('errorMsg');
+          const successMsg = document.getElementById('successMsg');
+          const cloudinaryErrorMsg = document.getElementById('cloudinaryErrorMsg');
+          const cloudinarySuccessMsg = document.getElementById('cloudinarySuccessMsg');
+
+          let selectedFile = null;
+
+          // Tab switching functionality
+          function switchTab(tabName) {
+               // Hide all tab contents
+               document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+               });
+
+               // Remove active class from all tabs
+               document.querySelectorAll('.tab').forEach(tab => {
+                    tab.classList.remove('active');
+               });
+
+               // Show selected tab content
+               document.getElementById(tabName + '-tab').classList.add('active');
+
+               // Add active class to clicked tab
+               event.target.classList.add('active');
+
+               // Hide results when switching tabs
+               resultsSection.style.display = 'none';
+               hideAllMessages();
+          }
+
+          // Drag and drop functionality
+          uploadArea.addEventListener('dragover', (e) => {
+               e.preventDefault();
+               uploadArea.classList.add('dragover');
+          });
+
+          uploadArea.addEventListener('dragleave', () => {
+               uploadArea.classList.remove('dragover');
+          });
+
+          uploadArea.addEventListener('drop', (e) => {
+               e.preventDefault();
+               uploadArea.classList.remove('dragover');
+               const files = e.dataTransfer.files;
+               if (files.length > 0) {
+                    handleFileSelect(files[0]);
+               }
+          });
+
+          uploadArea.addEventListener('click', () => {
+               fileInput.click();
+          });
+
+          fileInput.addEventListener('change', (e) => {
+               if (e.target.files.length > 0) {
+                    handleFileSelect(e.target.files[0]);
+               }
+          });
+
+          function handleFileSelect(file) {
+               if (!file.type.startsWith('image/')) {
+                    showError('Please select a valid image file.');
+                    return;
+               }
+
+               selectedFile = file;
+               const reader = new FileReader();
+               reader.onload = (e) => {
+                    previewImage.src = e.target.result;
+                    previewSection.style.display = 'block';
+                    mergeBtn.style.display = 'inline-block';
+                    hideAllMessages();
+               };
+               reader.readAsDataURL(file);
+          }
+
+          // Upload and merge functionality
+          mergeBtn.addEventListener('click', async () => {
+               if (!selectedFile) {
+                    showError('Please select an image first.');
+                    return;
+               }
+
+               const formData = new FormData();
+               formData.append('file', selectedFile);
+
+               try {
+                    showLoading('Merging your artwork with products... This may take a moment.');
+                    hideAllMessages();
+
+                    const response = await fetch('http://localhost:2000/api/merge-images', {
+                         method: 'POST',
+                         body: formData
+                    });
+
+                    if (!response.ok) {
+                         throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    console.log('Response data:', data);
+
+                    hideLoading();
+                    displayResults(data.imageUrls, '🎉 Your Merged Products');
+                    showSuccess('Images merged successfully! 🎉');
+
+               } catch (error) {
+                    console.error('Error:', error);
+                    hideLoading();
+                    showError(`Error merging images: ${error.message}`);
+               }
+          });
+
+          // Load Cloudinary images functionality
+          loadCloudinaryBtn.addEventListener('click', async () => {
+               try {
+                    showLoading('Loading images from Cloudinary...');
+                    hideAllMessages();
+
+                    // Create sample Cloudinary images (you can modify this to fetch actual images)
+                    const cloudinaryImages = {
+                         'Product Templates': {
+                              'cup': 'https://res.cloudinary.com/drxdger3x/image/upload/cup.png',
+                              'pillow': 'https://res.cloudinary.com/drxdger3x/image/upload/pillow.png',
+                              'book': 'https://res.cloudinary.com/drxdger3x/image/upload/book.png',
+                              'iphone': 'https://res.cloudinary.com/drxdger3x/image/upload/iphone.png',
+                              'bag': 'https://res.cloudinary.com/drxdger3x/image/upload/bag.png',
+                              'shirt': 'https://res.cloudinary.com/drxdger3x/image/upload/shirt.png'
+                         }
+                    };
+
+                    hideLoading();
+                    displayCloudinaryResults(cloudinaryImages);
+                    showCloudinarySuccess('Cloudinary images loaded successfully! ☁️');
+
+               } catch (error) {
+                    console.error('Error:', error);
+                    hideLoading();
+                    showCloudinaryError(`Error loading Cloudinary images: ${error.message}`);
+               }
+          });
+
+          function displayResults(mergedData, title) {
+               gallery.innerHTML = '';
+               resultsTitle.textContent = title;
+
+               // Check if we have base64 images for instant display
+               const imagesToShow = mergedData.images || mergedData.urls || mergedData;
+
+               Object.entries(imagesToShow).forEach(([product, imageData]) => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+
+                    card.innerHTML = `
+                    <div class="product-title">${product.toUpperCase()}</div>
+                    <img class="product-image" src="${imageData}" alt="${product} with your artwork" loading="lazy">
+                `;
+
+                    gallery.appendChild(card);
+               });
+
+               resultsSection.style.display = 'block';
+               resultsSection.scrollIntoView({ behavior: 'smooth' });
+          }
+
+          function displayCloudinaryResults(cloudinaryData) {
+               gallery.innerHTML = '';
+               resultsTitle.textContent = '☁️ Cloudinary Image Gallery';
+
+               Object.entries(cloudinaryData).forEach(([category, images]) => {
+                    // Add category header
+                    const categoryHeader = document.createElement('div');
+                    categoryHeader.style.gridColumn = '1 / -1';
+                    categoryHeader.style.textAlign = 'center';
+                    categoryHeader.style.margin = '20px 0';
+                    categoryHeader.innerHTML = `<h3 style="color: #667eea; font-size: 1.5rem;">${category}</h3>`;
+                    gallery.appendChild(categoryHeader);
+
+                    Object.entries(images).forEach(([imageName, imageUrl]) => {
+                         const card = document.createElement('div');
+                         card.className = 'product-card';
+
+                         card.innerHTML = `
+                         <div class="product-title">${imageName.toUpperCase()}</div>
+                         <img class="product-image" src="${imageUrl}" alt="${imageName} from Cloudinary" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                         <div style="display: none; color: #ff6b6b; padding: 20px;">❌ Image not found</div>
+                     `;
+
+                         gallery.appendChild(card);
+                    });
+               });
+
+               resultsSection.style.display = 'block';
+               resultsSection.scrollIntoView({ behavior: 'smooth' });
+          }
+
+          function showLoading(text = 'Loading...') {
+               loadingText.textContent = text;
+               loading.style.display = 'block';
+               mergeBtn.disabled = true;
+               loadCloudinaryBtn.disabled = true;
+               if (urlMergeBtn) urlMergeBtn.disabled = true;
+          }
+
+          function hideLoading() {
+               loading.style.display = 'none';
+               mergeBtn.disabled = false;
+               loadCloudinaryBtn.disabled = false;
+               if (urlMergeBtn) urlMergeBtn.disabled = false;
+          }
+
+          function showError(message) {
+               errorMsg.textContent = message;
+               errorMsg.style.display = 'block';
+               successMsg.style.display = 'none';
+          }
+
+          function showSuccess(message) {
+               successMsg.textContent = message;
+               successMsg.style.display = 'block';
+               errorMsg.style.display = 'none';
+          }
+
+          function showCloudinaryError(message) {
+               cloudinaryErrorMsg.textContent = message;
+               cloudinaryErrorMsg.style.display = 'block';
+               cloudinarySuccessMsg.style.display = 'none';
+          }
+
+          function showCloudinarySuccess(message) {
+               cloudinarySuccessMsg.textContent = message;
+               cloudinarySuccessMsg.style.display = 'block';
+               cloudinaryErrorMsg.style.display = 'none';
+          }
+
+          function hideAllMessages() {
+               errorMsg.style.display = 'none';
+               successMsg.style.display = 'none';
+               cloudinaryErrorMsg.style.display = 'none';
+               cloudinarySuccessMsg.style.display = 'none';
+               // Also hide URL messages
+               const urlErrorMsg = document.getElementById('urlErrorMsg');
+               const urlSuccessMsg = document.getElementById('urlSuccessMsg');
+               if (urlErrorMsg) urlErrorMsg.style.display = 'none';
+               if (urlSuccessMsg) urlSuccessMsg.style.display = 'none';
+          }
+
+          // URL-related functionality
+          const urlPreviewBtn = document.getElementById('urlPreviewBtn');
+          const urlMergeBtn = document.getElementById('urlMergeBtn');
+          const imageUrlInput = document.getElementById('imageUrlInput');
+          const urlPreviewSection = document.getElementById('urlPreviewSection');
+          const urlPreviewImage = document.getElementById('urlPreviewImage');
+          const urlErrorMsg = document.getElementById('urlErrorMsg');
+          const urlSuccessMsg = document.getElementById('urlSuccessMsg');
+
+          urlPreviewBtn.addEventListener('click', () => {
+               const imageUrl = imageUrlInput.value.trim();
+               
+               if (!imageUrl) {
+                    showUrlError('Please enter an image URL');
+                    return;
+               }
+
+               // Validate URL format
+               try {
+                    new URL(imageUrl);
+               } catch (e) {
+                    showUrlError('Please enter a valid URL');
+                    return;
+               }
+
+               // Show preview
+               urlPreviewImage.src = imageUrl;
+               urlPreviewImage.onload = () => {
+                    urlPreviewSection.style.display = 'block';
+                    hideUrlMessages();
+               };
+               urlPreviewImage.onerror = () => {
+                    showUrlError('Failed to load image from URL. Please check the URL and try again.');
+                    urlPreviewSection.style.display = 'none';
+               };
+          });
+
+          urlMergeBtn.addEventListener('click', async () => {
+               const imageUrl = imageUrlInput.value.trim();
+               
+               if (!imageUrl) {
+                    showUrlError('Please enter an image URL');
+                    return;
+               }
+
+               try {
+                    showLoading('Merging your image with products... This may take a moment.');
+                    hideUrlMessages();
+
+                    const response = await fetch('/api/merge-from-url', {
+                         method: 'POST',
+                         headers: {
+                              'Content-Type': 'application/json',
+                         },
+                         body: JSON.stringify({ imageUrl: imageUrl })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                         throw new Error(data.error || 'Failed to merge images');
+                    }
+
+                    hideLoading();
+                    displayResults(data.imageUrls, '🎨 Your Merged Products from URL');
+                    showUrlSuccess('Images merged successfully! 🎉');
+
+               } catch (error) {
+                    console.error('Error:', error);
+                    hideLoading();
+                    showUrlError(`Error merging images: ${error.message}`);
+               }
+          });
+
+          function showUrlError(message) {
+               urlErrorMsg.textContent = message;
+               urlErrorMsg.style.display = 'block';
+               urlSuccessMsg.style.display = 'none';
+          }
+
+          function showUrlSuccess(message) {
+               urlSuccessMsg.textContent = message;
+               urlSuccessMsg.style.display = 'block';
+               urlErrorMsg.style.display = 'none';
+          }
+
+          function hideUrlMessages() {
+               urlErrorMsg.style.display = 'none';
+               urlSuccessMsg.style.display = 'none';
+          }
+
+          // Allow Enter key to trigger preview
+          imageUrlInput.addEventListener('keypress', (e) => {
+               if (e.key === 'Enter') {
+                    urlPreviewBtn.click();
+               }
+          });
+     </script>
+</body>
+
+</html>
