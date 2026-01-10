@@ -22,6 +22,7 @@ exports.mergedImagess = async (artworkUrl) => {
     const products = ["cup", "pillow", "book", "iphone", "bag", "shirt"];
     const mergedImages = {};
     const mergedImagesBase64 = {}; // Add this for instant display
+    console.log(process.env.CLOUDINARY_CLOUD_NAME)
 
     for (const product of products) {
       const productUrl = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/${product}.png`;
